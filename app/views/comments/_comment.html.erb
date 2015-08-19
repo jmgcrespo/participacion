@@ -4,8 +4,11 @@
     <% if comment.hidden? %>
       <%= t("debates.comment.deleted") %>
     <% else %>
-
-      <%= avatar_image(comment.user, size: 32, class: 'left') %>
+      <% if comment.user.moderator? %> <!-- AND has activated CHECKBOX comment as moderator -->
+        <%= image_tag('moderator_avatar.png', size: 32, class: "moderator-avatar left") %>
+      <% else %>
+        <%= avatar_image(comment.user, size: 32, class: "left") %>
+      <% end %>
       <!-- if comment.user.hidden?
         <i class="icon-deleted user-deleted"></i>
            end -->
@@ -15,8 +18,12 @@
 
           <!--  if comment.user.hidden?
             <span class="user-name"><%= t("debates.comment.user_deleted") %></span>
-                else -->
-            <span class="user-name"><%= comment.user.name %></span>
+              elsif -->
+            <% if comment.user.moderator? %> <!-- AND activate moderator CHECKBOX -->
+              <span class="user-name"><%= t("debates.comment.moderator") %></span>
+            <% else %>
+              <span class="user-name"><%= comment.user.name %></span>
+            <% end %>
             <% if comment.user.official? %>
               &nbsp;&bullet;&nbsp;
               <span class="label round level-<%= comment.user.official_level %>">
@@ -41,6 +48,8 @@
 
         <% if comment.user.official? %>
           <p class="comment-user level-<%= comment.user.official_level %>"><%= comment.body %></p>
+        <% elsif comment.user.moderator? %> <!-- AND has activated CHECKBOX comment as moderator & all badges are hidden (100% anonymous) -->
+          <p class="comment-user is-moderator"><%= comment.body %></p>
         <% elsif comment.user == @debate.author %>
           <p class="comment-user is-author"><%= comment.body %></p>
         <% else %>
@@ -72,6 +81,5 @@
       <div class="comment-children">
         <%= render comment.children.with_deleted.reorder('id DESC, lft') %>
       </div>
-
   </div>
 </div>
